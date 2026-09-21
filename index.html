@@ -1,0 +1,2883 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<title>SONIC BOUNCE</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent;
+}
+
+html,
+body{
+    margin:0;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#05070d;
+    color:white;
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Arial,
+        sans-serif;
+}
+
+body{
+    position:relative;
+}
+
+/* ================= CANVAS ================= */
+
+#canvas{
+    position:fixed;
+    inset:0;
+    width:100%;
+    height:100%;
+    z-index:1;
+}
+
+/* ================= APP ================= */
+
+#app{
+    position:fixed;
+    inset:0;
+    z-index:5;
+    pointer-events:none;
+}
+
+/* ================= TOP ================= */
+
+.top{
+    position:absolute;
+    top:16px;
+    left:16px;
+    right:16px;
+
+    height:64px;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    padding:8px 10px 8px 12px;
+
+    border:1px solid rgba(255,255,255,.10);
+    border-radius:20px;
+
+    background:rgba(8,12,20,.84);
+    backdrop-filter:blur(20px);
+    -webkit-backdrop-filter:blur(20px);
+
+    pointer-events:auto;
+
+    box-shadow:
+        0 12px 40px rgba(0,0,0,.35);
+}
+
+.logoArea{
+    display:flex;
+    align-items:center;
+    gap:11px;
+}
+
+.logo{
+    width:44px;
+    height:44px;
+
+    border-radius:14px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:
+        linear-gradient(
+            135deg,
+            #654cff,
+            #1ed7ff
+        );
+
+    box-shadow:
+        0 0 25px rgba(93,82,255,.35);
+}
+
+.logoBall{
+    width:24px;
+    height:24px;
+
+    border-radius:50%;
+
+    background:#dce8ff;
+
+    box-shadow:
+        0 0 15px rgba(255,255,255,.5);
+}
+
+.title{
+    font-size:20px;
+    font-weight:850;
+    letter-spacing:.5px;
+}
+
+.subtitle{
+    margin-top:2px;
+
+    font-size:9px;
+
+    color:#7f899d;
+
+    letter-spacing:.5px;
+}
+
+.topRight{
+    display:flex;
+    align-items:center;
+    gap:7px;
+}
+
+.micStatus{
+    height:44px;
+
+    display:flex;
+    align-items:center;
+    gap:9px;
+
+    padding:0 12px;
+
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:14px;
+
+    background:rgba(12,17,28,.8);
+
+    color:#9ba5b7;
+
+    font-size:12px;
+}
+
+.statusDot{
+    width:9px;
+    height:9px;
+
+    border-radius:50%;
+
+    background:#ff4e69;
+
+    box-shadow:
+        0 0 12px rgba(255,78,105,.8);
+}
+
+.statusDot.on{
+    background:#39e69b;
+
+    box-shadow:
+        0 0 12px rgba(57,230,155,.8);
+}
+
+.topButton{
+    width:44px;
+    height:44px;
+
+    border-radius:14px;
+
+    border:1px solid rgba(255,255,255,.08);
+
+    background:#111725;
+
+    color:white;
+
+    font-size:19px;
+
+    cursor:pointer;
+}
+
+/* ================= DB PANEL ================= */
+
+.dbPanel{
+    position:absolute;
+
+    top:92px;
+    left:16px;
+
+    width:270px;
+
+    padding:17px;
+
+    border:1px solid rgba(255,255,255,.10);
+    border-radius:22px;
+
+    background:rgba(7,11,19,.78);
+
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+
+    pointer-events:none;
+}
+
+.dbTitle{
+    font-size:11px;
+
+    color:#747f94;
+
+    letter-spacing:1px;
+
+    text-transform:uppercase;
+}
+
+.dbNumber{
+    margin-top:8px;
+
+    font-size:31px;
+
+    font-weight:850;
+}
+
+.dbNumber span{
+    color:#8791a5;
+    font-size:14px;
+}
+
+.dbBar{
+    width:100%;
+    height:9px;
+
+    margin-top:10px;
+
+    border-radius:20px;
+
+    background:#111722;
+
+    overflow:hidden;
+
+    border:1px solid rgba(255,255,255,.06);
+}
+
+.dbFill{
+    width:0%;
+    height:100%;
+
+    border-radius:20px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #37e19a,
+            #ffd34d,
+            #ff456d
+        );
+
+    transition:width .15s;
+}
+
+.dbZone{
+    margin-top:12px;
+
+    font-size:15px;
+
+    font-weight:750;
+
+    color:#dce2ed;
+}
+
+.dbBottom{
+    display:flex;
+    justify-content:space-between;
+
+    margin-top:10px;
+
+    color:#737e92;
+
+    font-size:10px;
+}
+
+/* ================= CONTROLS ================= */
+
+.controls{
+    position:absolute;
+
+    left:16px;
+    right:16px;
+    bottom:16px;
+
+    display:grid;
+
+    grid-template-columns:
+        1.25fr
+        1fr
+        1fr
+        1fr;
+
+    gap:10px;
+
+    pointer-events:auto;
+}
+
+.card{
+    min-width:0;
+
+    padding:13px;
+
+    border-radius:18px;
+
+    border:1px solid rgba(255,255,255,.09);
+
+    background:rgba(8,12,20,.88);
+
+    backdrop-filter:blur(20px);
+    -webkit-backdrop-filter:blur(20px);
+
+    box-shadow:
+        0 12px 40px rgba(0,0,0,.28);
+}
+
+.cardTitle{
+    margin-bottom:10px;
+
+    color:#818b9e;
+
+    font-size:10px;
+
+    letter-spacing:1px;
+
+    text-transform:uppercase;
+}
+
+.row{
+    display:flex;
+    align-items:center;
+    gap:7px;
+
+    flex-wrap:wrap;
+}
+
+button,
+select{
+    min-height:39px;
+
+    padding:8px 12px;
+
+    border-radius:11px;
+
+    border:1px solid rgba(255,255,255,.09);
+
+    background:#151c2a;
+
+    color:#f4f6fa;
+
+    font-size:12px;
+    font-weight:650;
+
+    cursor:pointer;
+
+    outline:none;
+}
+
+button:active{
+    transform:scale(.97);
+}
+
+button.active{
+    background:
+        linear-gradient(
+            135deg,
+            #7353ff,
+            #4c80ff
+        );
+
+    border-color:transparent;
+}
+
+.sliderRow{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+input[type="range"]{
+    width:100%;
+
+    height:5px;
+
+    accent-color:#7255ff;
+
+    cursor:pointer;
+}
+
+.value{
+    min-width:38px;
+
+    text-align:right;
+
+    color:#b9c1d0;
+
+    font-size:11px;
+}
+
+/* ================= WARNING ================= */
+
+.warning{
+    position:absolute;
+
+    top:88px;
+    left:50%;
+
+    transform:
+        translateX(-50%)
+        translateY(-10px);
+
+    opacity:0;
+
+    padding:10px 18px;
+
+    border-radius:30px;
+
+    background:rgba(80,10,28,.92);
+
+    border:1px solid rgba(255,80,110,.35);
+
+    color:#ffd0d8;
+
+    font-size:12px;
+    font-weight:800;
+
+    transition:
+        opacity .2s,
+        transform .2s;
+
+    pointer-events:none;
+}
+
+.warning.show{
+    opacity:1;
+
+    transform:
+        translateX(-50%)
+        translateY(0);
+}
+
+/* ================= MIC BUTTON ================= */
+
+#micButton{
+    min-width:120px;
+}
+
+/* ================= MOBILE ================= */
+
+@media(max-width:850px){
+
+    body{
+        overflow:hidden;
+    }
+
+    .top{
+        top:9px;
+        left:9px;
+        right:9px;
+
+        height:56px;
+
+        border-radius:17px;
+    }
+
+    .logo{
+        width:38px;
+        height:38px;
+
+        border-radius:12px;
+    }
+
+    .logoBall{
+        width:21px;
+        height:21px;
+    }
+
+    .title{
+        font-size:17px;
+    }
+
+    .subtitle{
+        display:none;
+    }
+
+    .micStatus{
+        display:none;
+    }
+
+    .topButton{
+        width:38px;
+        height:38px;
+    }
+
+    .dbPanel{
+        top:75px;
+        left:9px;
+
+        width:calc(100% - 18px);
+
+        padding:13px;
+
+        border-radius:18px;
+    }
+
+    .dbNumber{
+        font-size:27px;
+    }
+
+    .dbZone{
+        font-size:14px;
+    }
+
+    /*
+       IMPORTANT:
+       MOBILE CONTROLS ARE A SCROLLABLE
+       BOTTOM PANEL.
+       THEY NO LONGER OVERLAP.
+    */
+
+    .controls{
+        left:9px;
+        right:9px;
+
+        bottom:9px;
+
+        display:flex;
+        flex-direction:column;
+
+        gap:7px;
+
+        max-height:
+            calc(100vh - 255px);
+
+        overflow-y:auto;
+
+        padding-right:2px;
+
+        scrollbar-width:none;
+    }
+
+    .controls::-webkit-scrollbar{
+        display:none;
+    }
+
+    .card{
+        width:100%;
+
+        flex:none;
+
+        padding:11px;
+
+        border-radius:17px;
+    }
+
+    .cardTitle{
+        margin-bottom:8px;
+    }
+
+    button,
+    select{
+        min-height:38px;
+    }
+
+    .warning{
+        top:143px;
+
+        font-size:11px;
+
+        white-space:nowrap;
+    }
+}
+
+/* ================= SMALL PHONE ================= */
+
+@media(max-width:500px){
+
+    .dbPanel{
+        top:72px;
+    }
+
+    .controls{
+        max-height:
+            calc(100vh - 245px);
+    }
+
+    .title{
+        font-size:16px;
+    }
+
+    .logo{
+        width:36px;
+        height:36px;
+    }
+
+}
+
+/* ================= VERY SMALL ================= */
+
+@media(max-width:370px){
+
+    .dbPanel{
+        padding:10px;
+    }
+
+    .dbNumber{
+        font-size:24px;
+    }
+
+    .controls{
+        max-height:
+            calc(100vh - 225px);
+    }
+
+    .card{
+        padding:9px;
+    }
+
+    button,
+    select{
+        padding:7px 9px;
+        font-size:11px;
+    }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<canvas id="canvas"></canvas>
+
+<div id="app">
+
+    <!-- ================= TOP ================= -->
+
+    <div class="top">
+
+        <div class="logoArea">
+
+            <div class="logo">
+                <div class="logoBall"></div>
+            </div>
+
+            <div>
+                <div class="title">
+                    SONIC BOUNCE
+                </div>
+
+                <div class="subtitle">
+                    ДЫБЫС • ФИЗИКА • ШУ ДЕҢГЕЙІ
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="topRight">
+
+            <div class="micStatus">
+
+                <div
+                    id="statusDot"
+                    class="statusDot">
+                </div>
+
+                <span id="statusText">
+                    Микрофон өшірулі
+                </span>
+
+            </div>
+
+            <button
+                id="micButton"
+                class="topButton">
+                🎙
+            </button>
+
+            <button
+                id="fullscreenButton"
+                class="topButton">
+                ⛶
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================= DB ================= -->
+
+    <div class="dbPanel">
+
+        <div class="dbTitle">
+            Шу деңгейі
+        </div>
+
+        <div class="dbNumber">
+
+            <span id="db">
+                30
+            </span>
+
+            <span>
+                дБ*
+            </span>
+
+        </div>
+
+        <div class="dbBar">
+
+            <div
+                id="dbFill"
+                class="dbFill">
+            </div>
+
+        </div>
+
+        <div
+            id="dbZone"
+            class="dbZone">
+
+            Бос, тыныш сынып
+
+        </div>
+
+        <div class="dbBottom">
+
+            <span>
+                FPS <b id="fps">60</b>
+            </span>
+
+            <span>
+                Шар <b id="ballCount">35</b>
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================= WARNING ================= -->
+
+    <div
+        id="warning"
+        class="warning">
+
+        ТШШ!
+
+    </div>
+
+
+    <!-- ================= CONTROLS ================= -->
+
+    <div class="controls">
+
+
+        <!-- MODE -->
+
+        <div class="card">
+
+            <div class="cardTitle">
+                Режим
+            </div>
+
+            <div class="row">
+
+                <button
+                    class="mode active"
+                    data-mode="sound">
+                    Дыбыс
+                </button>
+
+                <button
+                    class="mode"
+                    data-mode="gravity">
+                    Gravity
+                </button>
+
+                <button
+                    class="mode"
+                    data-mode="anti">
+                    Anti-G
+                </button>
+
+                <button
+                    class="mode"
+                    data-mode="explosion">
+                    Explosion
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- BALLS -->
+
+        <div class="card">
+
+            <div class="cardTitle">
+                Шарлар
+            </div>
+
+            <div class="sliderRow">
+
+                <input
+                    id="ballSlider"
+                    type="range"
+                    min="5"
+                    max="100"
+                    value="35">
+
+                <div
+                    id="ballValue"
+                    class="value">
+                    35
+                </div>
+
+            </div>
+
+            <div
+                class="row"
+                style="margin-top:8px">
+
+                <select id="ballStyle">
+
+                    <option value="neon">
+                        Neon
+                    </option>
+
+                    <option value="bubble">
+                        Bubble
+                    </option>
+
+                    <option value="stars">
+                        Stars
+                    </option>
+
+                    <option value="emoji">
+                        Emoji
+                    </option>
+
+                </select>
+
+                <button id="randomButton">
+                    ↻
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- MICROPHONE -->
+
+        <div class="card">
+
+            <div class="cardTitle">
+                Микрофон
+            </div>
+
+            <div class="sliderRow">
+
+                <input
+                    id="sensitivity"
+                    type="range"
+                    min=".5"
+                    max="3"
+                    step=".1"
+                    value="1.3">
+
+                <div
+                    id="sensitivityValue"
+                    class="value">
+                    1.3×
+                </div>
+
+            </div>
+
+            <button
+                id="voiceButton"
+                style="width:100%;margin-top:8px">
+
+                Ескертулер: ҚОСУЛЫ
+
+            </button>
+
+        </div>
+
+
+        <!-- PHYSICS -->
+
+        <div class="card">
+
+            <div class="cardTitle">
+                Физика
+            </div>
+
+            <div class="sliderRow">
+
+                <input
+                    id="gravity"
+                    type="range"
+                    min="0"
+                    max="1.5"
+                    step=".05"
+                    value=".45">
+
+                <div
+                    id="gravityValue"
+                    class="value">
+                    0.45
+                </div>
+
+            </div>
+
+            <div
+                class="row"
+                style="margin-top:8px">
+
+                <button id="pauseButton">
+                    Ⅱ Пауза
+                </button>
+
+                <button id="clearButton">
+                    Тазалау
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =====================================================
+   CANVAS
+===================================================== */
+
+const canvas =
+    document.getElementById("canvas");
+
+const ctx =
+    canvas.getContext("2d");
+
+let width =
+    window.innerWidth;
+
+let height =
+    window.innerHeight;
+
+let dpr =
+    Math.min(
+        window.devicePixelRatio || 1,
+        2
+    );
+
+
+function resize(){
+
+    width =
+        window.innerWidth;
+
+    height =
+        window.innerHeight;
+
+    dpr =
+        Math.min(
+            window.devicePixelRatio || 1,
+            2
+        );
+
+    canvas.width =
+        width * dpr;
+
+    canvas.height =
+        height * dpr;
+
+    canvas.style.width =
+        width + "px";
+
+    canvas.style.height =
+        height + "px";
+
+    ctx.setTransform(
+        dpr,
+        0,
+        0,
+        dpr,
+        0,
+        0
+    );
+}
+
+
+window.addEventListener(
+    "resize",
+    resize
+);
+
+resize();
+
+
+/* =====================================================
+   VARIABLES
+===================================================== */
+
+let balls = [];
+
+let particles = [];
+
+let gameMode =
+    "sound";
+
+let paused =
+    false;
+
+let micLevel =
+    0;
+
+let smoothMic =
+    0;
+
+let microphoneActive =
+    false;
+
+let voiceEnabled =
+    true;
+
+let lastVoice =
+    0;
+
+let lastZone =
+    "";
+
+
+/* =====================================================
+   AUDIO
+===================================================== */
+
+let audioContext =
+    null;
+
+let analyser =
+    null;
+
+let microphoneStream =
+    null;
+
+let audioData =
+    null;
+
+
+/* =====================================================
+   COLORS
+===================================================== */
+
+function randomColor(){
+
+    return Math.random()*360;
+
+}
+
+
+/* =====================================================
+   BALL
+===================================================== */
+
+class Ball{
+
+    constructor(x,y){
+
+        this.radius =
+            8 + Math.random()*15;
+
+        this.x =
+            x ??
+            Math.random()*width;
+
+        this.y =
+            y ??
+            180 +
+            Math.random()*
+            Math.max(
+                100,
+                height-350
+            );
+
+        this.vx =
+            (Math.random()-.5)*3;
+
+        this.vy =
+            (Math.random()-.5)*3;
+
+        this.color =
+            randomColor();
+
+        this.rotation =
+            Math.random()*Math.PI*2;
+
+        this.rotationSpeed =
+            (Math.random()-.5)*.05;
+
+        this.emoji =
+            ["●","✦","★","◆","✿","●"]
+            [
+                Math.floor(
+                    Math.random()*6
+                )
+            ];
+
+    }
+
+
+    update(){
+
+        if(paused)
+            return;
+
+
+        const gravity =
+            Number(
+                document.getElementById(
+                    "gravity"
+                ).value
+            );
+
+        const sensitivity =
+            Number(
+                document.getElementById(
+                    "sensitivity"
+                ).value
+            );
+
+
+        /* ================= GRAVITY ================= */
+
+        if(
+            gameMode === "gravity" ||
+            gameMode === "sound"
+        ){
+
+            this.vy +=
+                gravity*.055;
+
+        }
+
+
+        /* ================= ANTI G ================= */
+
+        if(
+            gameMode === "anti"
+        ){
+
+            this.vy -=
+                gravity*.055;
+
+        }
+
+
+        /* ================= SOUND ================= */
+
+        if(
+            gameMode === "sound"
+        ){
+
+            const force =
+                smoothMic *
+                sensitivity *
+                .7;
+
+            this.vy -=
+                force;
+
+            this.vx +=
+                Math.sin(
+                    performance.now()*.002 +
+                    this.x*.01
+                ) *
+                force *
+                .04;
+
+        }
+
+
+        /* ================= EXPLOSION ================= */
+
+        if(
+            gameMode === "explosion" &&
+            smoothMic > .55
+        ){
+
+            const dx =
+                this.x -
+                width/2;
+
+            const dy =
+                this.y -
+                height/2;
+
+            const distance =
+                Math.max(
+                    Math.hypot(dx,dy),
+                    1
+                );
+
+            const force =
+                smoothMic*.5;
+
+            this.vx +=
+                dx/distance *
+                force;
+
+            this.vy +=
+                dy/distance *
+                force;
+
+        }
+
+
+        /* ================= FRICTION ================= */
+
+        this.vx *= .995;
+        this.vy *= .995;
+
+
+        this.x +=
+            this.vx;
+
+        this.y +=
+            this.vy;
+
+
+        this.rotation +=
+            this.rotationSpeed;
+
+
+        /* ================= BOUNDS ================= */
+
+        const top =
+            78;
+
+        const bottom =
+            Math.max(
+                top+100,
+                height-25
+            );
+
+
+        if(
+            this.x-this.radius < 0
+        ){
+
+            this.x =
+                this.radius;
+
+            this.vx =
+                Math.abs(
+                    this.vx
+                )*.9;
+
+        }
+
+
+        if(
+            this.x+this.radius > width
+        ){
+
+            this.x =
+                width-this.radius;
+
+            this.vx =
+                -Math.abs(
+                    this.vx
+                )*.9;
+
+        }
+
+
+        if(
+            this.y-this.radius < top
+        ){
+
+            this.y =
+                top+this.radius;
+
+            this.vy =
+                Math.abs(
+                    this.vy
+                )*.9;
+
+        }
+
+
+        if(
+            this.y+this.radius > bottom
+        ){
+
+            this.y =
+                bottom-this.radius;
+
+            this.vy =
+                -Math.abs(
+                    this.vy
+                )*.9;
+
+        }
+
+    }
+
+
+    draw(){
+
+        const style =
+            document.getElementById(
+                "ballStyle"
+            ).value;
+
+        const glow =
+            12 +
+            smoothMic*35;
+
+
+        ctx.save();
+
+        ctx.translate(
+            this.x,
+            this.y
+        );
+
+        ctx.rotate(
+            this.rotation
+        );
+
+
+        /* ================= EMOJI ================= */
+
+        if(
+            style === "emoji"
+        ){
+
+            ctx.font =
+                `${this.radius*2}px Arial`;
+
+            ctx.textAlign =
+                "center";
+
+            ctx.textBaseline =
+                "middle";
+
+            ctx.fillText(
+                this.emoji,
+                0,
+                0
+            );
+
+            ctx.restore();
+
+            return;
+
+        }
+
+
+        /* ================= STAR ================= */
+
+        if(
+            style === "stars"
+        ){
+
+            ctx.shadowBlur =
+                glow;
+
+            ctx.shadowColor =
+                `hsl(${this.color},100%,65%)`;
+
+            ctx.fillStyle =
+                `hsl(${this.color},100%,70%)`;
+
+            ctx.beginPath();
+
+            for(
+                let i=0;
+                i<10;
+                i++
+            ){
+
+                const r =
+                    i%2===0
+                    ? this.radius
+                    : this.radius*.4;
+
+                const a =
+                    -Math.PI/2 +
+                    i*Math.PI/5;
+
+                ctx.lineTo(
+                    Math.cos(a)*r,
+                    Math.sin(a)*r
+                );
+
+            }
+
+            ctx.closePath();
+
+            ctx.fill();
+
+            ctx.restore();
+
+            return;
+
+        }
+
+
+        /* ================= NEON/BUBBLE ================= */
+
+        const gradient =
+            ctx.createRadialGradient(
+                -this.radius*.35,
+                -this.radius*.4,
+                1,
+                0,
+                0,
+                this.radius
+            );
+
+
+        gradient.addColorStop(
+            0,
+            "#ffffff"
+        );
+
+        gradient.addColorStop(
+            .15,
+            `hsl(${this.color},100%,82%)`
+        );
+
+        gradient.addColorStop(
+            1,
+            `hsl(${this.color},85%,48%)`
+        );
+
+
+        ctx.shadowBlur =
+            glow;
+
+        ctx.shadowColor =
+            `hsl(${this.color},100%,60%)`;
+
+        ctx.fillStyle =
+            gradient;
+
+
+        ctx.beginPath();
+
+        ctx.arc(
+            0,
+            0,
+            this.radius,
+            0,
+            Math.PI*2
+        );
+
+        ctx.fill();
+
+
+        if(
+            style === "bubble"
+        ){
+
+            ctx.shadowBlur =
+                0;
+
+            ctx.strokeStyle =
+                "rgba(255,255,255,.8)";
+
+            ctx.lineWidth =
+                1.5;
+
+            ctx.stroke();
+
+        }
+
+
+        ctx.restore();
+
+    }
+
+}
+
+
+/* =====================================================
+   CREATE BALLS
+===================================================== */
+
+function createBalls(){
+
+    balls = [];
+
+    const count =
+        Number(
+            document.getElementById(
+                "ballSlider"
+            ).value
+        );
+
+
+    for(
+        let i=0;
+        i<count;
+        i++
+    ){
+
+        balls.push(
+            new Ball()
+        );
+
+    }
+
+
+    document.getElementById(
+        "ballCount"
+    ).textContent =
+        count;
+
+}
+
+
+/* =====================================================
+   COLLISION
+===================================================== */
+
+function collisions(){
+
+    for(
+        let i=0;
+        i<balls.length;
+        i++
+    ){
+
+        for(
+            let j=i+1;
+            j<balls.length;
+            j++
+        ){
+
+            const a =
+                balls[i];
+
+            const b =
+                balls[j];
+
+
+            const dx =
+                b.x-a.x;
+
+            const dy =
+                b.y-a.y;
+
+            const distance =
+                Math.hypot(
+                    dx,
+                    dy
+                );
+
+            const minDistance =
+                a.radius+b.radius;
+
+
+            if(
+                distance > 0 &&
+                distance < minDistance
+            ){
+
+                const nx =
+                    dx/distance;
+
+                const ny =
+                    dy/distance;
+
+                const overlap =
+                    minDistance-distance;
+
+
+                a.x -=
+                    nx*overlap*.5;
+
+                a.y -=
+                    ny*overlap*.5;
+
+
+                b.x +=
+                    nx*overlap*.5;
+
+                b.y +=
+                    ny*overlap*.5;
+
+
+                const relativeX =
+                    b.vx-a.vx;
+
+                const relativeY =
+                    b.vy-a.vy;
+
+
+                const velocity =
+                    relativeX*nx +
+                    relativeY*ny;
+
+
+                if(
+                    velocity > 0
+                )
+                    continue;
+
+
+                const impulse =
+                    -velocity*.9;
+
+
+                a.vx -=
+                    impulse*nx;
+
+                a.vy -=
+                    impulse*ny;
+
+
+                b.vx +=
+                    impulse*nx;
+
+                b.vy +=
+                    impulse*ny;
+
+            }
+
+        }
+
+    }
+
+}
+
+
+/* =====================================================
+   PARTICLES
+===================================================== */
+
+function particleBurst(
+    x,
+    y
+){
+
+    for(
+        let i=0;
+        i<8;
+        i++
+    ){
+
+        const angle =
+            Math.random()*
+            Math.PI*2;
+
+        const speed =
+            1+Math.random()*4;
+
+
+        particles.push({
+
+            x:x,
+
+            y:y,
+
+            vx:
+                Math.cos(angle)*speed,
+
+            vy:
+                Math.sin(angle)*speed,
+
+            life:1,
+
+            color:
+                randomColor()
+
+        });
+
+    }
+
+}
+
+
+function updateParticles(){
+
+    for(
+        let i=particles.length-1;
+        i>=0;
+        i--
+    ){
+
+        const p =
+            particles[i];
+
+
+        p.x +=
+            p.vx;
+
+        p.y +=
+            p.vy;
+
+        p.vy +=
+            .08;
+
+        p.life -=
+            .025;
+
+
+        if(
+            p.life <= 0
+        ){
+
+            particles.splice(
+                i,
+                1
+            );
+
+            continue;
+
+        }
+
+
+        ctx.globalAlpha =
+            p.life;
+
+        ctx.fillStyle =
+            `hsl(${p.color},100%,70%)`;
+
+        ctx.beginPath();
+
+        ctx.arc(
+            p.x,
+            p.y,
+            2,
+            0,
+            Math.PI*2
+        );
+
+        ctx.fill();
+
+    }
+
+    ctx.globalAlpha=1;
+
+}
+
+
+/* =====================================================
+   BACKGROUND
+===================================================== */
+
+function background(){
+
+    const gradient =
+        ctx.createRadialGradient(
+            width*.5,
+            height*.35,
+            0,
+            width*.5,
+            height*.35,
+            Math.max(width,height)
+        );
+
+
+    gradient.addColorStop(
+        0,
+        "#111a2e"
+    );
+
+    gradient.addColorStop(
+        .5,
+        "#090e19"
+    );
+
+    gradient.addColorStop(
+        1,
+        "#04060b"
+    );
+
+
+    ctx.fillStyle =
+        gradient;
+
+    ctx.fillRect(
+        0,
+        0,
+        width,
+        height
+    );
+
+
+    /* GRID */
+
+    ctx.strokeStyle =
+        "rgba(100,120,180,.045)";
+
+    ctx.lineWidth=1;
+
+
+    const size=42;
+
+
+    for(
+        let x=0;
+        x<width;
+        x+=size
+    ){
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            x,
+            0
+        );
+
+        ctx.lineTo(
+            x,
+            height
+        );
+
+        ctx.stroke();
+
+    }
+
+
+    for(
+        let y=0;
+        y<height;
+        y+=size
+    ){
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            0,
+            y
+        );
+
+        ctx.lineTo(
+            width,
+            y
+        );
+
+        ctx.stroke();
+
+    }
+
+}
+
+
+/* =====================================================
+   MICROPHONE
+===================================================== */
+
+async function startMicrophone(){
+
+    if(
+        microphoneActive
+    ){
+
+        stopMicrophone();
+
+        return;
+
+    }
+
+
+    try{
+
+        microphoneStream =
+            await navigator
+            .mediaDevices
+            .getUserMedia({
+
+                audio:{
+                    echoCancellation:false,
+                    noiseSuppression:false,
+                    autoGainControl:false
+                }
+
+            });
+
+
+        audioContext =
+            new (
+                window.AudioContext ||
+                window.webkitAudioContext
+            )();
+
+
+        analyser =
+            audioContext
+            .createAnalyser();
+
+
+        analyser.fftSize =
+            512;
+
+        analyser.smoothingTimeConstant =
+            .7;
+
+
+        audioData =
+            new Uint8Array(
+                analyser.fftSize
+            );
+
+
+        const source =
+            audioContext
+            .createMediaStreamSource(
+                microphoneStream
+            );
+
+
+        source.connect(
+            analyser
+        );
+
+
+        microphoneActive =
+            true;
+
+
+        document
+        .getElementById(
+            "statusDot"
+        )
+        .classList
+        .add("on");
+
+
+        document.getElementById(
+            "statusText"
+        ).textContent =
+            "Микрофон қосулы";
+
+
+        document.getElementById(
+            "micButton"
+        ).textContent =
+            "🔴";
+
+
+        readMicrophone();
+
+    }
+
+    catch(error){
+
+        alert(
+            "Микрофонға рұқсат берілмеді."
+        );
+
+    }
+
+}
+
+
+function stopMicrophone(){
+
+    if(
+        microphoneStream
+    ){
+
+        microphoneStream
+        .getTracks()
+        .forEach(
+            track =>
+            track.stop()
+        );
+
+    }
+
+
+    if(
+        audioContext
+    ){
+
+        audioContext.close();
+
+    }
+
+
+    microphoneActive =
+        false;
+
+    analyser =
+        null;
+
+
+    document
+    .getElementById(
+        "statusDot"
+    )
+    .classList
+    .remove("on");
+
+
+    document.getElementById(
+        "statusText"
+    ).textContent =
+        "Микрофон өшірулі";
+
+
+    document.getElementById(
+        "micButton"
+    ).textContent =
+        "🎙";
+
+
+    micLevel=0;
+
+}
+
+
+/* =====================================================
+   READ MIC
+===================================================== */
+
+function readMicrophone(){
+
+    if(
+        !microphoneActive ||
+        !analyser
+    )
+        return;
+
+
+    analyser.getByteTimeDomainData(
+        audioData
+    );
+
+
+    let sum=0;
+
+
+    for(
+        let i=0;
+        i<audioData.length;
+        i++
+    ){
+
+        const value =
+            (audioData[i]-128)/128;
+
+        sum +=
+            value*value;
+
+    }
+
+
+    const rms =
+        Math.sqrt(
+            sum/audioData.length
+        );
+
+
+    const sensitivity =
+        Number(
+            document.getElementById(
+                "sensitivity"
+            ).value
+        );
+
+
+    let level =
+        (rms-.008) *
+        7 *
+        sensitivity;
+
+
+    level =
+        Math.max(
+            0,
+            Math.min(
+                1,
+                level
+            )
+        );
+
+
+    micLevel +=
+        (level-micLevel)*.2;
+
+
+    smoothMic +=
+        (micLevel-smoothMic)*.18;
+
+
+    /*
+       Approximate classroom dB:
+       30 -> 95
+    */
+
+    const db =
+        Math.round(
+            30+
+            smoothMic*65
+        );
+
+
+    updateDB(
+        Math.min(
+            db,
+            95
+        )
+    );
+
+
+    requestAnimationFrame(
+        readMicrophone
+    );
+
+}
+
+
+/* =====================================================
+   DB
+===================================================== */
+
+function getZone(db){
+
+    if(db < 40){
+
+        return {
+            name:
+                "Бос, тыныш сынып",
+            type:
+                "quiet"
+        };
+
+    }
+
+
+    if(db < 50){
+
+        return {
+            name:
+                "Оқушылар тыныш жұмыс істеп отыр",
+            type:
+                "work"
+        };
+
+    }
+
+
+    if(db < 60){
+
+        return {
+            name:
+                "Қалыпты сабақ, әңгімелесу",
+            type:
+                "normal"
+        };
+
+    }
+
+
+    if(db < 70){
+
+        return {
+            name:
+                "Топтық жұмыс, қызу әңгіме",
+            type:
+                "hey"
+        };
+
+    }
+
+
+    if(db < 80){
+
+        return {
+            name:
+                "Қатты шу, айқай",
+            type:
+                "tsh"
+        };
+
+    }
+
+
+    return {
+        name:
+            "Өте қатты шу",
+        type:
+            "danger"
+    };
+
+}
+
+
+function updateDB(db){
+
+    const zone =
+        getZone(db);
+
+
+    document.getElementById(
+        "db"
+    ).textContent =
+        db;
+
+
+    const percent =
+        Math.max(
+            0,
+            Math.min(
+                100,
+                (db-30)/65*100
+            )
+        );
+
+
+    document.getElementById(
+        "dbFill"
+    ).style.width =
+        percent+"%";
+
+
+    document.getElementById(
+        "dbZone"
+    ).textContent =
+        zone.name;
+
+
+    handleVoice(
+        zone.type
+    );
+
+}
+
+
+/* =====================================================
+   VOICE
+===================================================== */
+
+function speak(text){
+
+    if(!voiceEnabled)
+        return;
+
+
+    if(
+        !("speechSynthesis" in window)
+    )
+        return;
+
+
+    const now =
+        Date.now();
+
+
+    if(
+        now-lastVoice < 2500
+    )
+        return;
+
+
+    speechSynthesis.cancel();
+
+
+    const utterance =
+        new SpeechSynthesisUtterance(
+            text
+        );
+
+
+    utterance.lang =
+        "ru-RU";
+
+    utterance.rate =
+        1.1;
+
+    utterance.pitch =
+        1;
+
+
+    speechSynthesis.speak(
+        utterance
+    );
+
+
+    lastVoice =
+        now;
+
+}
+
+
+/* =====================================================
+   60-70 = ЭЙ
+   70-80 = ТШШ
+===================================================== */
+
+function handleVoice(type){
+
+    if(
+        type === lastZone
+    )
+        return;
+
+
+    lastZone =
+        type;
+
+
+    const warning =
+        document.getElementById(
+            "warning"
+        );
+
+
+    if(
+        type === "hey"
+    ){
+
+        speak(
+            "Эй!"
+        );
+
+
+        warning.textContent =
+            "ЭЙ! 60–70 дБ";
+
+
+        warning.classList
+            .add("show");
+
+
+        setTimeout(
+            ()=>{
+                warning.classList
+                    .remove("show");
+            },
+            1700
+        );
+
+    }
+
+
+    else if(
+        type === "tsh"
+    ){
+
+        speak(
+            "ТШШ!"
+        );
+
+
+        warning.textContent =
+            "ТШШ! 70–80 дБ";
+
+
+        warning.classList
+            .add("show");
+
+    }
+
+
+    else if(
+        type === "danger"
+    ){
+
+        speak(
+            "ТШШ! Шу тым жоғары!"
+        );
+
+
+        warning.textContent =
+            "ТШШ! 80+ дБ";
+
+
+        warning.classList
+            .add("show");
+
+    }
+
+
+    else{
+
+        warning.classList
+            .remove("show");
+
+    }
+
+}
+
+
+/* =====================================================
+   GAME LOOP
+===================================================== */
+
+let lastTime =
+    performance.now();
+
+let frameCounter=0;
+
+let fpsTime =
+    performance.now();
+
+
+function loop(time){
+
+    background();
+
+
+    if(
+        !paused
+    ){
+
+        balls.forEach(
+            ball =>
+            ball.update()
+        );
+
+
+        collisions();
+
+
+        if(
+            smoothMic>.7 &&
+            Math.random()<.08 &&
+            balls.length
+        ){
+
+            const ball =
+                balls[
+                    Math.floor(
+                        Math.random()*
+                        balls.length
+                    )
+                ];
+
+
+            particleBurst(
+                ball.x,
+                ball.y
+            );
+
+        }
+
+    }
+
+
+    updateParticles();
+
+
+    balls.forEach(
+        ball =>
+        ball.draw()
+    );
+
+
+    frameCounter++;
+
+
+    if(
+        time-fpsTime>600
+    ){
+
+        const currentFPS =
+            Math.round(
+                frameCounter/
+                (
+                    (time-fpsTime)/
+                    1000
+                )
+            );
+
+
+        document.getElementById(
+            "fps"
+        ).textContent =
+            Math.min(
+                currentFPS,
+                60
+            );
+
+
+        frameCounter=0;
+
+        fpsTime=time;
+
+    }
+
+
+    requestAnimationFrame(
+        loop
+    );
+
+}
+
+
+requestAnimationFrame(
+    loop
+);
+
+
+/* =====================================================
+   MODE BUTTONS
+===================================================== */
+
+document
+.querySelectorAll(".mode")
+.forEach(
+    button=>{
+
+        button.addEventListener(
+            "click",
+            ()=>{
+
+                document
+                .querySelectorAll(".mode")
+                .forEach(
+                    b =>
+                    b.classList
+                    .remove("active")
+                );
+
+
+                button.classList
+                    .add("active");
+
+
+                gameMode =
+                    button.dataset.mode;
+
+            }
+        );
+
+    }
+);
+
+
+/* =====================================================
+   BALL SLIDER
+===================================================== */
+
+document.getElementById(
+    "ballSlider"
+).addEventListener(
+    "input",
+    function(){
+
+        const count =
+            Number(
+                this.value
+            );
+
+
+        document.getElementById(
+            "ballValue"
+        ).textContent =
+            count;
+
+
+        document.getElementById(
+            "ballCount"
+        ).textContent =
+            count;
+
+
+        while(
+            balls.length<count
+        ){
+
+            balls.push(
+                new Ball()
+            );
+
+        }
+
+
+        while(
+            balls.length>count
+        ){
+
+            balls.pop();
+
+        }
+
+    }
+);
+
+
+/* =====================================================
+   SENSITIVITY
+===================================================== */
+
+document.getElementById(
+    "sensitivity"
+).addEventListener(
+    "input",
+    function(){
+
+        document.getElementById(
+            "sensitivityValue"
+        ).textContent =
+            this.value+"×";
+
+    }
+);
+
+
+/* =====================================================
+   GRAVITY
+===================================================== */
+
+document.getElementById(
+    "gravity"
+).addEventListener(
+    "input",
+    function(){
+
+        document.getElementById(
+            "gravityValue"
+        ).textContent =
+            this.value;
+
+    }
+);
+
+
+/* =====================================================
+   MIC BUTTON
+===================================================== */
+
+document.getElementById(
+    "micButton"
+).addEventListener(
+    "click",
+    startMicrophone
+);
+
+
+/* =====================================================
+   VOICE BUTTON
+===================================================== */
+
+document.getElementById(
+    "voiceButton"
+).addEventListener(
+    "click",
+    function(){
+
+        voiceEnabled =
+            !voiceEnabled;
+
+
+        this.textContent =
+            voiceEnabled
+            ? "Ескертулер: ҚОСУЛЫ"
+            : "Ескертулер: ӨШІРУЛІ";
+
+
+        this.classList.toggle(
+            "active",
+            voiceEnabled
+        );
+
+
+        if(
+            !voiceEnabled &&
+            "speechSynthesis" in window
+        ){
+
+            speechSynthesis.cancel();
+
+        }
+
+    }
+);
+
+
+/* =====================================================
+   PAUSE
+===================================================== */
+
+document.getElementById(
+    "pauseButton"
+).addEventListener(
+    "click",
+    function(){
+
+        paused =
+            !paused;
+
+
+        this.textContent =
+            paused
+            ? "▶ Жалғастыру"
+            : "Ⅱ Пауза";
+
+    }
+);
+
+
+/* =====================================================
+   CLEAR
+===================================================== */
+
+document.getElementById(
+    "clearButton"
+).addEventListener(
+    "click",
+    function(){
+
+        balls=[];
+
+    }
+);
+
+
+/* =====================================================
+   RANDOM
+===================================================== */
+
+document.getElementById(
+    "randomButton"
+).addEventListener(
+    "click",
+    function(){
+
+        balls.forEach(
+            ball=>{
+
+                ball.x =
+                    20+
+                    Math.random()*
+                    Math.max(
+                        20,
+                        width-40
+                    );
+
+
+                ball.y =
+                    100+
+                    Math.random()*
+                    Math.max(
+                        50,
+                        height-180
+                    );
+
+
+                ball.vx =
+                    (Math.random()-.5)*5;
+
+
+                ball.vy =
+                    (Math.random()-.5)*5;
+
+
+                ball.color =
+                    randomColor();
+
+            }
+        );
+
+    }
+);
+
+
+/* =====================================================
+   FULLSCREEN
+===================================================== */
+
+document.getElementById(
+    "fullscreenButton"
+).addEventListener(
+    "click",
+    function(){
+
+        if(
+            !document.fullscreenElement
+        ){
+
+            document.documentElement
+                .requestFullscreen?.();
+
+        }
+        else{
+
+            document.exitFullscreen?.();
+
+        }
+
+    }
+);
+
+
+/* =====================================================
+   CLICK ON CANVAS = BALL
+===================================================== */
+
+canvas.addEventListener(
+    "pointerdown",
+    function(event){
+
+        const ball =
+            new Ball(
+                event.clientX,
+                event.clientY
+            );
+
+
+        ball.vx =
+            (Math.random()-.5)*8;
+
+        ball.vy =
+            -Math.random()*6;
+
+
+        balls.push(
+            ball
+        );
+
+
+        const max =
+            Number(
+                document.getElementById(
+                    "ballSlider"
+                ).value
+            );
+
+
+        while(
+            balls.length>max
+        ){
+
+            balls.shift();
+
+        }
+
+    }
+);
+
+
+/* =====================================================
+   INITIAL
+===================================================== */
+
+createBalls();
+
+updateDB(30);
+
+</script>
+
+</body>
+</html>
