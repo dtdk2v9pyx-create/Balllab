@@ -1,0 +1,1706 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+<title>Sonic Bounce</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent;
+}
+
+html,body{
+    margin:0;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#05070d;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+    color:white;
+}
+
+canvas{
+    position:fixed;
+    inset:0;
+    width:100%;
+    height:100%;
+}
+
+/* TOP */
+
+.top{
+    position:fixed;
+    top:12px;
+    left:12px;
+    right:12px;
+    height:64px;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    padding:8px 12px;
+
+    border-radius:20px;
+
+    background:rgba(8,11,20,.82);
+    border:1px solid rgba(255,255,255,.09);
+
+    backdrop-filter:blur(20px);
+
+    z-index:10;
+}
+
+.logo{
+    display:flex;
+    align-items:center;
+    gap:11px;
+}
+
+.logoIcon{
+    width:44px;
+    height:44px;
+    border-radius:14px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:linear-gradient(135deg,#6b4cff,#24d8ff);
+
+    box-shadow:0 0 25px rgba(90,90,255,.35);
+}
+
+.logoBall{
+    width:21px;
+    height:21px;
+    border-radius:50%;
+    background:white;
+    box-shadow:0 0 15px white;
+}
+
+.title{
+    font-size:20px;
+    font-weight:900;
+}
+
+.subtitle{
+    margin-top:2px;
+    font-size:9px;
+    color:#7e8798;
+    letter-spacing:.8px;
+}
+
+.micButton{
+    height:45px;
+    padding:0 15px;
+
+    display:flex;
+    align-items:center;
+    gap:9px;
+
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:15px;
+
+    background:#111622;
+    color:#aeb6c6;
+
+    font-size:12px;
+    font-weight:700;
+
+    cursor:pointer;
+}
+
+.micDot{
+    width:9px;
+    height:9px;
+    border-radius:50%;
+    background:#ff4262;
+
+    box-shadow:0 0 12px rgba(255,66,98,.8);
+}
+
+.micDot.active{
+    background:#42ed9c;
+    box-shadow:0 0 15px rgba(66,237,156,.9);
+}
+
+/* SOUND PANEL */
+
+.soundPanel{
+    position:fixed;
+
+    top:91px;
+    left:14px;
+
+    width:280px;
+
+    padding:15px;
+
+    border-radius:20px;
+
+    background:rgba(8,11,20,.76);
+    border:1px solid rgba(255,255,255,.08);
+
+    backdrop-filter:blur(20px);
+
+    z-index:10;
+    pointer-events:none;
+}
+
+.smallTitle{
+    font-size:10px;
+    color:#778195;
+    letter-spacing:1px;
+    text-transform:uppercase;
+}
+
+.db{
+    margin-top:3px;
+    font-size:32px;
+    font-weight:900;
+}
+
+.db span{
+    font-size:14px;
+    color:#8c95a5;
+}
+
+.bar{
+    width:100%;
+    height:8px;
+    margin-top:9px;
+
+    border-radius:10px;
+    overflow:hidden;
+
+    background:#141a26;
+}
+
+.barFill{
+    height:100%;
+    width:0%;
+
+    border-radius:10px;
+
+    background:linear-gradient(
+        90deg,
+        #35e29b,
+        #ffd447,
+        #ff4166
+    );
+
+    transition:width .1s;
+}
+
+.status{
+    margin-top:9px;
+    font-size:13px;
+    font-weight:700;
+    color:#d8deea;
+}
+
+/* START */
+
+.start{
+    position:fixed;
+    inset:0;
+
+    z-index:30;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:rgba(3,5,10,.45);
+}
+
+.startBox{
+    width:min(410px,calc(100% - 35px));
+
+    padding:30px;
+
+    text-align:center;
+
+    border-radius:28px;
+
+    background:rgba(9,13,23,.94);
+
+    border:1px solid rgba(255,255,255,.1);
+
+    backdrop-filter:blur(25px);
+
+    box-shadow:0 30px 100px rgba(0,0,0,.55);
+}
+
+.startBall{
+    width:70px;
+    height:70px;
+
+    margin:auto;
+
+    border-radius:50%;
+
+    background:
+        radial-gradient(
+            circle at 30% 25%,
+            white,
+            #7060ff 30%,
+            #26d6ff
+        );
+
+    box-shadow:0 0 45px rgba(90,90,255,.7);
+
+    animation:float 1.8s infinite ease-in-out;
+}
+
+@keyframes float{
+    0%,100%{
+        transform:translateY(0);
+    }
+
+    50%{
+        transform:translateY(-12px);
+    }
+}
+
+.startTitle{
+    margin-top:20px;
+    font-size:29px;
+    font-weight:950;
+}
+
+.startText{
+    margin-top:10px;
+    color:#8b95a8;
+    font-size:13px;
+    line-height:1.5;
+}
+
+.startButton{
+    width:100%;
+    height:52px;
+
+    margin-top:22px;
+
+    border:0;
+    border-radius:16px;
+
+    background:linear-gradient(
+        135deg,
+        #684cff,
+        #3d8cff
+    );
+
+    color:white;
+
+    font-size:15px;
+    font-weight:850;
+
+    cursor:pointer;
+}
+
+.hidden{
+    display:none;
+}
+
+/* SPEECH VISUAL */
+
+.speech{
+    position:absolute;
+
+    font-size:13px;
+    font-weight:900;
+
+    color:white;
+
+    padding:5px 10px;
+
+    border-radius:12px;
+
+    background:rgba(10,14,23,.9);
+    border:1px solid rgba(255,255,255,.1);
+
+    pointer-events:none;
+
+    animation:speech .9s ease-out forwards;
+
+    z-index:20;
+}
+
+@keyframes speech{
+    0%{
+        opacity:0;
+        transform:translate(-50%,0) scale(.7);
+    }
+
+    15%{
+        opacity:1;
+        transform:translate(-50%,-15px) scale(1);
+    }
+
+    100%{
+        opacity:0;
+        transform:translate(-50%,-60px) scale(.95);
+    }
+}
+
+@media(max-width:600px){
+
+    .top{
+        top:8px;
+        left:8px;
+        right:8px;
+        height:57px;
+    }
+
+    .logoIcon{
+        width:39px;
+        height:39px;
+    }
+
+    .title{
+        font-size:17px;
+    }
+
+    .subtitle{
+        display:none;
+    }
+
+    .micButton{
+        width:45px;
+        padding:0;
+        justify-content:center;
+    }
+
+    .micText{
+        display:none;
+    }
+
+    .soundPanel{
+        top:75px;
+        left:8px;
+        right:8px;
+        width:auto;
+        padding:12px;
+    }
+
+    .db{
+        font-size:27px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="canvas"></canvas>
+
+<!-- HEADER -->
+
+<div class="top">
+
+    <div class="logo">
+
+        <div class="logoIcon">
+            <div class="logoBall"></div>
+        </div>
+
+        <div>
+            <div class="title">SONIC BOUNCE</div>
+            <div class="subtitle">
+                СЫНЫПТАҒЫ ШУДЫ БАЙҚАУ
+            </div>
+        </div>
+
+    </div>
+
+    <button class="micButton" id="micButton">
+
+        <div class="micDot" id="micDot"></div>
+
+        <span class="micText" id="micText">
+            Микрофонды қосу
+        </span>
+
+    </button>
+
+</div>
+
+
+<!-- SOUND -->
+
+<div class="soundPanel">
+
+    <div class="smallTitle">
+        Шу деңгейі
+    </div>
+
+    <div class="db">
+        <span id="db">30</span>
+        <span>дБ</span>
+    </div>
+
+    <div class="bar">
+        <div class="barFill" id="barFill"></div>
+    </div>
+
+    <div class="status" id="status">
+        Бос, тыныш сынып
+    </div>
+
+</div>
+
+
+<!-- START -->
+
+<div class="start" id="start">
+
+    <div class="startBox">
+
+        <div class="startBall"></div>
+
+        <div class="startTitle">
+            SONIC BOUNCE
+        </div>
+
+        <div class="startText">
+            Микрофонды қосыңыз.<br>
+            Сыныптағы шу көбейген сайын
+            шариктер секіріп, реакция жасайды.
+        </div>
+
+        <button class="startButton" id="startButton">
+            Микрофонды қосу
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =====================================================
+   CANVAS
+===================================================== */
+
+const canvas =
+    document.getElementById("canvas");
+
+const ctx =
+    canvas.getContext("2d");
+
+let W = innerWidth;
+let H = innerHeight;
+let DPR = devicePixelRatio || 1;
+
+function resize(){
+
+    W = innerWidth;
+    H = innerHeight;
+
+    DPR = Math.min(
+        devicePixelRatio || 1,
+        2
+    );
+
+    canvas.width = W * DPR;
+    canvas.height = H * DPR;
+
+    canvas.style.width = W + "px";
+    canvas.style.height = H + "px";
+
+    ctx.setTransform(
+        DPR,
+        0,
+        0,
+        DPR,
+        0,
+        0
+    );
+}
+
+window.addEventListener(
+    "resize",
+    resize
+);
+
+resize();
+
+
+/* =====================================================
+   BALL
+===================================================== */
+
+const BALL_COUNT = 45;
+
+let balls = [];
+
+class Ball{
+
+    constructor(){
+
+        this.r =
+            10 + Math.random()*9;
+
+        this.x =
+            this.r +
+            Math.random()*
+            (W-this.r*2);
+
+        this.y =
+            160 +
+            Math.random()*
+            (H-180);
+
+        this.vx =
+            (Math.random()-.5)*1.2;
+
+        this.vy =
+            (Math.random()-.5)*1.2;
+
+        this.gravity =
+            .20 +
+            Math.random()*.08;
+
+        this.color =
+            180 +
+            Math.random()*110;
+
+        this.jumpPower = 0;
+
+        this.rotation =
+            Math.random()*Math.PI*2;
+    }
+
+
+    update(){
+
+        /*
+         * Шу деңгейіне байланысты
+         * СЕКІРУ КҮШІ
+         */
+
+        let jump = 0;
+
+        if(noiseDB < 40){
+
+            jump = 0;
+
+        }
+        else if(noiseDB < 50){
+
+            jump = .4;
+
+        }
+        else if(noiseDB < 60){
+
+            jump = 1.3;
+
+        }
+        else if(noiseDB < 70){
+
+            jump = 4;
+
+        }
+        else if(noiseDB < 80){
+
+            jump = 7;
+
+        }
+        else{
+
+            jump = 11;
+
+        }
+
+
+        /*
+         * Шариктер кездейсоқ
+         * секіре бастайды
+         */
+
+        if(
+            Math.random() <
+            .035 + jump*.008
+        ){
+
+            this.vy -=
+                jump *
+                (0.7 + Math.random()*.5);
+
+        }
+
+
+        /*
+         * Горизонталь қозғалыс
+         */
+
+        this.vx +=
+            (Math.random()-.5)
+            * .025
+            * (1+noiseLevel*5);
+
+
+        /*
+         * Қатты шу кезінде
+         * шариктер жан-жаққа көбірек
+         * қозғалады
+         */
+
+        this.vx *= .985;
+
+        this.vy += this.gravity;
+
+        this.vy *= .995;
+
+
+        this.x += this.vx;
+
+        this.y += this.vy;
+
+
+        /*
+         * Сол қабырға
+         */
+
+        if(
+            this.x-this.r < 0
+        ){
+
+            this.x =
+                this.r;
+
+            this.vx =
+                Math.abs(this.vx)*.8;
+
+        }
+
+
+        /*
+         * Оң қабырға
+         */
+
+        if(
+            this.x+this.r > W
+        ){
+
+            this.x =
+                W-this.r;
+
+            this.vx =
+                -Math.abs(this.vx)*.8;
+
+        }
+
+
+        /*
+         * Жоғарғы шекара
+         */
+
+        if(
+            this.y-this.r < 140
+        ){
+
+            this.y =
+                140+this.r;
+
+            this.vy =
+                Math.abs(this.vy)*.65;
+
+        }
+
+
+        /*
+         * Төменгі шекара
+         */
+
+        if(
+            this.y+this.r > H
+        ){
+
+            this.y =
+                H-this.r;
+
+            /*
+             * ДБ жоғары болған сайын
+             * қайта қатты секіреді
+             */
+
+            if(noiseDB >= 60){
+
+                this.vy =
+                    -(
+                        3 +
+                        noiseLevel*11
+                    );
+
+            }
+            else{
+
+                this.vy =
+                    -1.2;
+
+            }
+
+        }
+
+    }
+
+
+    draw(){
+
+        let glow =
+            10 +
+            noiseLevel*35;
+
+        ctx.save();
+
+        ctx.shadowBlur =
+            glow;
+
+        ctx.shadowColor =
+            `hsl(
+                ${this.color},
+                100%,
+                65%
+            )`;
+
+
+        const gradient =
+            ctx.createRadialGradient(
+                this.x-this.r*.35,
+                this.y-this.r*.4,
+                1,
+                this.x,
+                this.y,
+                this.r
+            );
+
+
+        gradient.addColorStop(
+            0,
+            "#ffffff"
+        );
+
+        gradient.addColorStop(
+            .18,
+            `hsl(
+                ${this.color},
+                100%,
+                82%
+            )`
+        );
+
+        gradient.addColorStop(
+            1,
+            `hsl(
+                ${this.color},
+                85%,
+                48%
+            )`
+        );
+
+
+        ctx.fillStyle =
+            gradient;
+
+        ctx.beginPath();
+
+        ctx.arc(
+            this.x,
+            this.y,
+            this.r,
+            0,
+            Math.PI*2
+        );
+
+        ctx.fill();
+
+        ctx.restore();
+
+    }
+
+}
+
+
+/* CREATE BALLS */
+
+function createBalls(){
+
+    balls = [];
+
+    for(
+        let i=0;
+        i<BALL_COUNT;
+        i++
+    ){
+
+        balls.push(
+            new Ball()
+        );
+
+    }
+
+}
+
+createBalls();
+
+
+/* =====================================================
+   BALL COLLISION
+===================================================== */
+
+function collisions(){
+
+    for(
+        let i=0;
+        i<balls.length;
+        i++
+    ){
+
+        for(
+            let j=i+1;
+            j<balls.length;
+            j++
+        ){
+
+            const a =
+                balls[i];
+
+            const b =
+                balls[j];
+
+            const dx =
+                b.x-a.x;
+
+            const dy =
+                b.y-a.y;
+
+            const distance =
+                Math.hypot(
+                    dx,
+                    dy
+                );
+
+            const minDistance =
+                a.r+b.r;
+
+
+            if(
+                distance > 0 &&
+                distance < minDistance
+            ){
+
+                const nx =
+                    dx/distance;
+
+                const ny =
+                    dy/distance;
+
+                const overlap =
+                    minDistance-distance;
+
+
+                a.x -=
+                    nx*overlap*.5;
+
+                a.y -=
+                    ny*overlap*.5;
+
+                b.x +=
+                    nx*overlap*.5;
+
+                b.y +=
+                    ny*overlap*.5;
+
+
+                /*
+                 * Қатты шу кезінде
+                 * соқтығысу күштірек
+                 */
+
+                const force =
+                    noiseLevel > .55
+                    ? 1.25
+                    : .85;
+
+
+                const avx =
+                    a.vx;
+
+                const avy =
+                    a.vy;
+
+
+                a.vx =
+                    b.vx*force;
+
+                a.vy =
+                    b.vy*force;
+
+                b.vx =
+                    avx*force;
+
+                b.vy =
+                    avy*force;
+
+            }
+
+        }
+
+    }
+
+}
+
+
+/* =====================================================
+   MICROPHONE
+===================================================== */
+
+let audioContext = null;
+let analyser = null;
+let stream = null;
+let audioData = null;
+
+let microphoneOn = false;
+
+let noiseLevel = 0;
+
+let noiseDB = 30;
+
+
+/* =====================================================
+   START MICROPHONE
+===================================================== */
+
+async function startMicrophone(){
+
+    if(microphoneOn){
+
+        stopMicrophone();
+
+        return;
+
+    }
+
+
+    try{
+
+        stream =
+            await navigator.mediaDevices
+            .getUserMedia({
+                audio:{
+                    echoCancellation:false,
+                    noiseSuppression:false,
+                    autoGainControl:false
+                }
+            });
+
+
+        audioContext =
+            new (
+                window.AudioContext ||
+                window.webkitAudioContext
+            )();
+
+
+        analyser =
+            audioContext.createAnalyser();
+
+        analyser.fftSize =
+            1024;
+
+        analyser.smoothingTimeConstant =
+            .75;
+
+
+        audioData =
+            new Uint8Array(
+                analyser.fftSize
+            );
+
+
+        const source =
+            audioContext
+            .createMediaStreamSource(
+                stream
+            );
+
+
+        source.connect(
+            analyser
+        );
+
+
+        microphoneOn = true;
+
+
+        document
+            .getElementById("micDot")
+            .classList
+            .add("active");
+
+
+        document.getElementById(
+            "micText"
+        ).textContent =
+            "Микрофон қосулы";
+
+
+        document
+            .getElementById("start")
+            .classList
+            .add("hidden");
+
+
+        readMicrophone();
+
+    }
+    catch(error){
+
+        alert(
+            "Микрофонға рұқсат беру керек."
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   AUDIO
+===================================================== */
+
+function readMicrophone(){
+
+    if(
+        !microphoneOn ||
+        !analyser
+    ){
+
+        return;
+
+    }
+
+
+    analyser.getByteTimeDomainData(
+        audioData
+    );
+
+
+    let sum = 0;
+
+
+    for(
+        let i=0;
+        i<audioData.length;
+        i++
+    ){
+
+        const value =
+            (audioData[i]-128)/128;
+
+        sum +=
+            value*value;
+
+    }
+
+
+    const rms =
+        Math.sqrt(
+            sum/audioData.length
+        );
+
+
+    /*
+     * Микрофонның нақты SPL дБ-сын
+     * браузер өлшей алмайды.
+     *
+     * Сондықтан бұл сайт үшін
+     * шартты сыныптық шкала.
+     */
+
+    let level =
+        (rms-.006)*9;
+
+
+    level =
+        Math.max(
+            0,
+            Math.min(
+                1,
+                level
+            )
+        );
+
+
+    noiseLevel +=
+        (
+            level-noiseLevel
+        )*.18;
+
+
+    /*
+     * 30–95 дБ шкаласы
+     */
+
+    noiseDB =
+        Math.round(
+            30 +
+            noiseLevel*65
+        );
+
+
+    updateInterface();
+
+    reactToNoise();
+
+    requestAnimationFrame(
+        readMicrophone
+    );
+
+}
+
+
+/* =====================================================
+   INTERFACE
+===================================================== */
+
+let previousZone =
+    "normal";
+
+let lastVoiceTime = 0;
+
+
+function getZone(db){
+
+    if(db < 40){
+
+        return "Бос, тыныш сынып";
+
+    }
+
+    if(db < 50){
+
+        return "Оқушылар тыныш жұмыс істеп отыр";
+
+    }
+
+    if(db < 60){
+
+        return "Қалыпты сабақ, әңгімелесу";
+
+    }
+
+    if(db < 70){
+
+        return "Топтық жұмыс, қызу әңгіме";
+
+    }
+
+    if(db < 80){
+
+        return "Қатты шу, айқай";
+
+    }
+
+    return "Өте қатты шу";
+
+}
+
+
+function updateInterface(){
+
+    document.getElementById(
+        "db"
+    ).textContent =
+        noiseDB;
+
+
+    const percent =
+        Math.max(
+            0,
+            Math.min(
+                100,
+                (noiseDB-30)/65*100
+            )
+        );
+
+
+    document.getElementById(
+        "barFill"
+    ).style.width =
+        percent+"%";
+
+
+    document.getElementById(
+        "status"
+    ).textContent =
+        getZone(noiseDB);
+
+}
+
+
+/* =====================================================
+   BALL REACTION
+===================================================== */
+
+function reactToNoise(){
+
+    let zone;
+
+    if(noiseDB < 60){
+
+        zone = "normal";
+
+    }
+    else if(noiseDB < 70){
+
+        zone = "hey";
+
+    }
+    else if(noiseDB < 80){
+
+        zone = "tsh";
+
+    }
+    else{
+
+        zone = "loud";
+
+    }
+
+
+    /*
+     * Жаңа деңгейге кіргенде
+     * шариктер бірден реакция береді.
+     */
+
+    if(zone !== previousZone){
+
+        previousZone = zone;
+
+
+        if(zone === "hey"){
+
+            makeBallsJump(5);
+
+            speak(
+                "Эй!"
+            );
+
+            showSpeech(
+                "Эй!"
+            );
+
+        }
+
+
+        if(zone === "tsh"){
+
+            makeBallsJump(9);
+
+            speak(
+                "Тшш!"
+            );
+
+            showSpeech(
+                "Тшш!"
+            );
+
+        }
+
+
+        if(zone === "loud"){
+
+            makeBallsJump(14);
+
+            speak(
+                "Тшш! Тыныш!"
+            );
+
+            showSpeech(
+                "Тшш!"
+            );
+
+        }
+
+    }
+
+
+    /*
+     * Егер сынып ұзақ уақыт шумный болса,
+     * шариктер қайта-қайта секіреді.
+     */
+
+    if(noiseDB >= 60){
+
+        const jumpChance =
+            noiseLevel *
+            .16;
+
+
+        if(
+            Math.random() <
+            jumpChance
+        ){
+
+            makeBallsJump(
+                2+
+                noiseLevel*8
+            );
+
+        }
+
+    }
+
+}
+
+
+/* =====================================================
+   MAKE BALLS JUMP
+===================================================== */
+
+function makeBallsJump(power){
+
+    balls.forEach(
+        ball => {
+
+            /*
+             * Әр шарик әртүрлі уақытта
+             * және әртүрлі күшпен секіреді.
+             */
+
+            if(
+                Math.random() <
+                .8
+            ){
+
+                ball.vy -=
+                    power *
+                    (
+                        .55+
+                        Math.random()*.8
+                    );
+
+                ball.vx +=
+                    (
+                        Math.random()-.5
+                    ) *
+                    power *
+                    .45;
+
+            }
+
+        }
+    );
+
+}
+
+
+/* =====================================================
+   VOICE
+===================================================== */
+
+function speak(text){
+
+    const now =
+        Date.now();
+
+
+    /*
+     * Дауысты тым жиі қайталамау.
+     */
+
+    if(
+        now-lastVoiceTime <
+        1700
+    ){
+
+        return;
+
+    }
+
+
+    lastVoiceTime =
+        now;
+
+
+    if(
+        !("speechSynthesis" in window)
+    ){
+
+        return;
+
+    }
+
+
+    speechSynthesis.cancel();
+
+
+    const voice =
+        new SpeechSynthesisUtterance(
+            text
+        );
+
+
+    /*
+     * "Эй" және "Тшш" үшін
+     * дауыс қаттырақ және қысқа.
+     */
+
+    voice.lang =
+        "ru-RU";
+
+    voice.rate =
+        1.25;
+
+    voice.pitch =
+        1.05;
+
+    voice.volume =
+        1;
+
+
+    speechSynthesis.speak(
+        voice
+    );
+
+}
+
+
+/* =====================================================
+   VISUAL SPEECH
+   Бұл ТЕК визуалды эффект.
+   Негізгі дыбыс speak() арқылы айтылады.
+===================================================== */
+
+function showSpeech(text){
+
+    for(
+        let i=0;
+        i<Math.min(
+            5,
+            balls.length
+        );
+        i++
+    ){
+
+        const ball =
+            balls[
+                Math.floor(
+                    Math.random()*
+                    balls.length
+                )
+            ];
+
+
+        const element =
+            document.createElement(
+                "div"
+            );
+
+
+        element.className =
+            "speech";
+
+
+        /*
+         * Бұл жазу тек қысқа
+         * визуалды эффект.
+         */
+
+        element.textContent =
+            text;
+
+
+        element.style.left =
+            ball.x+"px";
+
+
+        element.style.top =
+            ball.y+"px";
+
+
+        document.body.appendChild(
+            element
+        );
+
+
+        setTimeout(
+            ()=>{
+                element.remove();
+            },
+            900
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   BACKGROUND
+===================================================== */
+
+function drawBackground(){
+
+    const gradient =
+        ctx.createRadialGradient(
+            W*.5,
+            H*.5,
+            0,
+            W*.5,
+            H*.5,
+            Math.max(W,H)
+        );
+
+
+    gradient.addColorStop(
+        0,
+        "#10172a"
+    );
+
+    gradient.addColorStop(
+        .5,
+        "#080d18"
+    );
+
+    gradient.addColorStop(
+        1,
+        "#03050a"
+    );
+
+
+    ctx.fillStyle =
+        gradient;
+
+
+    ctx.fillRect(
+        0,
+        0,
+        W,
+        H
+    );
+
+
+    /*
+     * Жеңіл фондық тор
+     */
+
+    ctx.strokeStyle =
+        "rgba(100,130,190,.035)";
+
+
+    const grid = 45;
+
+
+    for(
+        let x=0;
+        x<W;
+        x+=grid
+    ){
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            x,
+            0
+        );
+
+        ctx.lineTo(
+            x,
+            H
+        );
+
+        ctx.stroke();
+
+    }
+
+
+    for(
+        let y=0;
+        y<H;
+        y+=grid
+    ){
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            0,
+            y
+        );
+
+        ctx.lineTo(
+            W,
+            y
+        );
+
+        ctx.stroke();
+
+    }
+
+}
+
+
+/* =====================================================
+   MAIN LOOP
+===================================================== */
+
+function animate(){
+
+    drawBackground();
+
+
+    balls.forEach(
+        ball =>
+            ball.update()
+    );
+
+
+    collisions();
+
+
+    balls.forEach(
+        ball =>
+            ball.draw()
+    );
+
+
+    requestAnimationFrame(
+        animate
+    );
+
+}
+
+animate();
+
+
+/* =====================================================
+   BUTTONS
+===================================================== */
+
+document.getElementById(
+    "startButton"
+).addEventListener(
+    "click",
+    startMicrophone
+);
+
+
+document.getElementById(
+    "micButton"
+).addEventListener(
+    "click",
+    startMicrophone
+);
+
+</script>
+
+</body>
+</html>
