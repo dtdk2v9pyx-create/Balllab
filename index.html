@@ -1,0 +1,1874 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width,
+               initial-scale=1.0,
+               maximum-scale=1.0,
+               user-scalable=no">
+
+<title>SONIC BOUNCE</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent;
+}
+
+html,body{
+    margin:0;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#05070d;
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Arial,
+        sans-serif;
+    color:white;
+}
+
+/* =========================
+   CANVAS
+========================= */
+
+canvas{
+    position:fixed;
+    inset:0;
+    width:100%;
+    height:100%;
+}
+
+
+/* =========================
+   TOP
+========================= */
+
+.top{
+    position:fixed;
+
+    top:15px;
+    left:15px;
+    right:15px;
+
+    height:62px;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    padding:8px 10px 8px 12px;
+
+    border-radius:20px;
+
+    background:rgba(8,11,19,.78);
+
+    border:1px solid
+        rgba(255,255,255,.09);
+
+    backdrop-filter:blur(18px);
+
+    z-index:10;
+}
+
+
+/* LOGO */
+
+.logo{
+    display:flex;
+    align-items:center;
+    gap:11px;
+}
+
+.logoIcon{
+    width:43px;
+    height:43px;
+
+    border-radius:14px;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    background:
+        linear-gradient(
+            135deg,
+            #674eff,
+            #25d9ff
+        );
+
+    box-shadow:
+        0 0 25px
+        rgba(90,90,255,.35);
+}
+
+.logoBall{
+    width:22px;
+    height:22px;
+
+    border-radius:50%;
+
+    background:white;
+
+    box-shadow:
+        0 0 12px
+        rgba(255,255,255,.8);
+}
+
+.title{
+    font-size:20px;
+    font-weight:900;
+    letter-spacing:.5px;
+}
+
+.sub{
+    font-size:9px;
+    color:#7e8798;
+    margin-top:2px;
+}
+
+
+/* MIC BUTTON */
+
+.mic{
+    display:flex;
+    align-items:center;
+    gap:9px;
+
+    height:44px;
+
+    padding:0 14px;
+
+    border-radius:14px;
+
+    background:#111622;
+
+    border:1px solid
+        rgba(255,255,255,.08);
+
+    color:#9ba4b5;
+
+    font-size:12px;
+
+    cursor:pointer;
+}
+
+.dot{
+    width:9px;
+    height:9px;
+
+    border-radius:50%;
+
+    background:#ff4868;
+
+    box-shadow:
+        0 0 12px
+        rgba(255,72,104,.8);
+}
+
+.dot.on{
+    background:#40e99b;
+
+    box-shadow:
+        0 0 14px
+        rgba(64,233,155,.9);
+}
+
+
+/* =========================
+   SOUND PANEL
+========================= */
+
+.sound{
+    position:fixed;
+
+    top:92px;
+    left:15px;
+
+    width:270px;
+
+    padding:15px;
+
+    border-radius:20px;
+
+    background:
+        rgba(8,11,19,.72);
+
+    border:
+        1px solid
+        rgba(255,255,255,.08);
+
+    backdrop-filter:blur(18px);
+
+    z-index:10;
+
+    pointer-events:none;
+}
+
+.soundTitle{
+    color:#788397;
+
+    font-size:10px;
+
+    letter-spacing:1px;
+
+    text-transform:uppercase;
+}
+
+.db{
+    margin-top:5px;
+
+    font-size:32px;
+
+    font-weight:900;
+}
+
+.db span{
+    font-size:14px;
+    color:#8993a5;
+}
+
+.bar{
+    margin-top:8px;
+
+    height:8px;
+
+    border-radius:10px;
+
+    overflow:hidden;
+
+    background:#111722;
+}
+
+.fill{
+    width:0%;
+    height:100%;
+
+    border-radius:10px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #3ce39a,
+            #ffd24d,
+            #ff3f6c
+        );
+
+    transition:width .12s;
+}
+
+.zone{
+    margin-top:9px;
+
+    font-size:13px;
+
+    font-weight:750;
+
+    color:#d8deea;
+}
+
+
+/* =========================
+   START SCREEN
+========================= */
+
+.start{
+    position:fixed;
+
+    inset:0;
+
+    display:flex;
+
+    justify-content:center;
+    align-items:center;
+
+    z-index:20;
+
+    background:
+        radial-gradient(
+            circle at center,
+            rgba(74,69,255,.15),
+            rgba(0,0,0,.55)
+        );
+}
+
+.startBox{
+    width:min(420px,calc(100% - 40px));
+
+    padding:30px;
+
+    text-align:center;
+
+    border-radius:28px;
+
+    background:
+        rgba(9,13,23,.9);
+
+    border:
+        1px solid
+        rgba(255,255,255,.1);
+
+    backdrop-filter:blur(25px);
+
+    box-shadow:
+        0 30px 100px
+        rgba(0,0,0,.5);
+}
+
+.startBall{
+    width:75px;
+    height:75px;
+
+    margin:auto;
+
+    border-radius:50%;
+
+    background:
+        radial-gradient(
+            circle at 30% 25%,
+            white,
+            #7060ff 30%,
+            #31cfff 100%
+        );
+
+    box-shadow:
+        0 0 45px
+        rgba(91,92,255,.65);
+
+    animation:
+        float 2s ease-in-out infinite;
+}
+
+@keyframes float{
+
+    0%,100%{
+        transform:translateY(0);
+    }
+
+    50%{
+        transform:translateY(-12px);
+    }
+
+}
+
+.startTitle{
+    margin-top:20px;
+
+    font-size:30px;
+
+    font-weight:950;
+}
+
+.startText{
+    margin-top:9px;
+
+    color:#8993a6;
+
+    font-size:13px;
+
+    line-height:1.5;
+}
+
+.startButton{
+
+    margin-top:22px;
+
+    width:100%;
+
+    height:52px;
+
+    border:0;
+
+    border-radius:16px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #684cff,
+            #3b8cff
+        );
+
+    color:white;
+
+    font-size:15px;
+
+    font-weight:850;
+
+    cursor:pointer;
+
+    box-shadow:
+        0 10px 35px
+        rgba(83,76,255,.35);
+}
+
+
+/* =========================
+   SPEECH BUBBLE
+========================= */
+
+.speech{
+
+    position:absolute;
+
+    padding:7px 12px;
+
+    border-radius:14px;
+
+    background:
+        rgba(15,19,31,.92);
+
+    border:
+        1px solid
+        rgba(255,255,255,.14);
+
+    color:white;
+
+    font-weight:900;
+
+    font-size:13px;
+
+    pointer-events:none;
+
+    transform:
+        translate(-50%,-100%);
+
+    white-space:nowrap;
+
+    opacity:0;
+
+    z-index:5;
+
+    box-shadow:
+        0 8px 30px
+        rgba(0,0,0,.35);
+}
+
+.speech.show{
+
+    animation:
+        speechUp 1.4s ease forwards;
+
+}
+
+@keyframes speechUp{
+
+    0%{
+        opacity:0;
+        transform:
+            translate(-50%,0)
+            scale(.7);
+    }
+
+    15%{
+        opacity:1;
+        transform:
+            translate(-50%,-100%)
+            scale(1);
+    }
+
+    75%{
+        opacity:1;
+    }
+
+    100%{
+        opacity:0;
+        transform:
+            translate(-50%,-160%)
+            scale(.95);
+    }
+
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width:600px){
+
+    .top{
+        top:9px;
+        left:9px;
+        right:9px;
+
+        height:56px;
+
+        border-radius:17px;
+    }
+
+    .logoIcon{
+        width:38px;
+        height:38px;
+
+        border-radius:12px;
+    }
+
+    .logoBall{
+        width:20px;
+        height:20px;
+    }
+
+    .title{
+        font-size:17px;
+    }
+
+    .sub{
+        display:none;
+    }
+
+    .mic{
+        width:44px;
+
+        padding:0;
+
+        justify-content:center;
+
+        font-size:18px;
+    }
+
+    .micText{
+        display:none;
+    }
+
+    .sound{
+
+        top:76px;
+        left:9px;
+        right:9px;
+
+        width:auto;
+
+        padding:12px;
+
+        border-radius:17px;
+    }
+
+    .db{
+        font-size:27px;
+    }
+
+}
+
+
+/* =========================
+   HIDE START
+========================= */
+
+.hidden{
+    display:none!important;
+}
+
+</style>
+</head>
+
+
+<body>
+
+
+<canvas id="canvas"></canvas>
+
+
+<!-- =========================
+     TOP
+========================= -->
+
+<div class="top">
+
+    <div class="logo">
+
+        <div class="logoIcon">
+            <div class="logoBall"></div>
+        </div>
+
+        <div>
+
+            <div class="title">
+                SONIC BOUNCE
+            </div>
+
+            <div class="sub">
+                СЫНЫПТАҒЫ ШУДЫ БАЙҚАУ
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <button
+        class="mic"
+        id="micButton">
+
+        <div
+            class="dot"
+            id="dot">
+        </div>
+
+        <span
+            class="micText"
+            id="micText">
+
+            Микрофонды қосу
+
+        </span>
+
+    </button>
+
+</div>
+
+
+<!-- =========================
+     SOUND
+========================= -->
+
+<div class="sound">
+
+    <div class="soundTitle">
+        Шу деңгейі
+    </div>
+
+    <div class="db">
+
+        <span id="db">
+            30
+        </span>
+
+        <span>
+            дБ
+        </span>
+
+    </div>
+
+    <div class="bar">
+
+        <div
+            class="fill"
+            id="fill">
+        </div>
+
+    </div>
+
+    <div
+        class="zone"
+        id="zone">
+
+        Бос, тыныш сынып
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     START
+========================= -->
+
+<div
+    class="start"
+    id="start">
+
+    <div class="startBox">
+
+        <div class="startBall"></div>
+
+        <div class="startTitle">
+            SONIC BOUNCE
+        </div>
+
+        <div class="startText">
+
+            Микрофонды қос.<br>
+            Сыныптағы шу көбейген сайын
+            шариктер реакция жасайды.
+
+        </div>
+
+        <button
+            class="startButton"
+            id="startButton">
+
+            Микрофонды қосу
+
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =====================================================
+   CANVAS
+===================================================== */
+
+const canvas =
+    document.getElementById("canvas");
+
+const ctx =
+    canvas.getContext("2d");
+
+
+let W =
+    innerWidth;
+
+let H =
+    innerHeight;
+
+let DPR =
+    Math.min(
+        devicePixelRatio || 1,
+        2
+    );
+
+
+function resize(){
+
+    W =
+        innerWidth;
+
+    H =
+        innerHeight;
+
+    DPR =
+        Math.min(
+            devicePixelRatio || 1,
+            2
+        );
+
+    canvas.width =
+        W * DPR;
+
+    canvas.height =
+        H * DPR;
+
+    canvas.style.width =
+        W+"px";
+
+    canvas.style.height =
+        H+"px";
+
+    ctx.setTransform(
+        DPR,
+        0,
+        0,
+        DPR,
+        0,
+        0
+    );
+
+}
+
+
+addEventListener(
+    "resize",
+    resize
+);
+
+resize();
+
+
+/* =====================================================
+   BALLS
+===================================================== */
+
+const BALL_COUNT = 42;
+
+let balls = [];
+
+
+function random(min,max){
+
+    return Math.random()*
+        (max-min)+min;
+
+}
+
+
+class Ball{
+
+    constructor(){
+
+        this.r =
+            random(10,19);
+
+        this.x =
+            random(
+                this.r,
+                W-this.r
+            );
+
+        this.y =
+            random(
+                170,
+                H-this.r
+            );
+
+        this.vx =
+            random(-.7,.7);
+
+        this.vy =
+            random(-.7,.7);
+
+        this.hue =
+            random(180,290);
+
+        this.targetX =
+            this.x;
+
+        this.targetY =
+            this.y;
+
+        this.talk=0;
+
+    }
+
+
+    update(){
+
+        /*
+         * Тыныш кезде шариктер
+         * өте жай қозғалады.
+         *
+         * Шу көбейген сайын
+         * қозғалыс күшейеді.
+         */
+
+        const strength =
+            0.25 +
+            noiseLevel * 5;
+
+
+        this.vx +=
+            random(-.035,.035)
+            * strength;
+
+        this.vy +=
+            random(-.035,.035)
+            * strength;
+
+
+        /*
+         * Шуға реакция
+         */
+
+        this.vx *= .985;
+
+        this.vy *= .985;
+
+
+        this.x +=
+            this.vx;
+
+        this.y +=
+            this.vy;
+
+
+        /*
+         * Қабырға
+         */
+
+        if(
+            this.x-this.r<0
+        ){
+
+            this.x =
+                this.r;
+
+            this.vx =
+                Math.abs(this.vx);
+
+        }
+
+
+        if(
+            this.x+this.r>W
+        ){
+
+            this.x =
+                W-this.r;
+
+            this.vx =
+                -Math.abs(this.vx);
+
+        }
+
+
+        if(
+            this.y-this.r<145
+        ){
+
+            this.y =
+                145+this.r;
+
+            this.vy =
+                Math.abs(this.vy);
+
+        }
+
+
+        if(
+            this.y+this.r>H
+        ){
+
+            this.y =
+                H-this.r;
+
+            this.vy =
+                -Math.abs(this.vy);
+
+        }
+
+
+        /*
+         * Шу қатты болғанда
+         * шариктер секіреді.
+         */
+
+        if(
+            noiseLevel>.48
+        ){
+
+            this.vy -=
+                noiseLevel*.025;
+
+        }
+
+    }
+
+
+    draw(){
+
+        const glow =
+            12+
+            noiseLevel*35;
+
+
+        ctx.save();
+
+
+        ctx.shadowBlur =
+            glow;
+
+        ctx.shadowColor =
+            `hsl(
+                ${this.hue},
+                100%,
+                65%
+            )`;
+
+
+        const gradient =
+            ctx.createRadialGradient(
+                this.x-this.r*.35,
+                this.y-this.r*.4,
+                1,
+                this.x,
+                this.y,
+                this.r
+            );
+
+
+        gradient.addColorStop(
+            0,
+            "#ffffff"
+        );
+
+        gradient.addColorStop(
+            .18,
+            `hsl(
+                ${this.hue},
+                100%,
+                82%
+            )`
+        );
+
+        gradient.addColorStop(
+            1,
+            `hsl(
+                ${this.hue},
+                85%,
+                48%
+            )`
+        );
+
+
+        ctx.fillStyle =
+            gradient;
+
+
+        ctx.beginPath();
+
+        ctx.arc(
+            this.x,
+            this.y,
+            this.r,
+            0,
+            Math.PI*2
+        );
+
+        ctx.fill();
+
+
+        ctx.restore();
+
+    }
+
+}
+
+
+/* =====================================================
+   CREATE
+===================================================== */
+
+function createBalls(){
+
+    balls=[];
+
+    for(
+        let i=0;
+        i<BALL_COUNT;
+        i++
+    ){
+
+        balls.push(
+            new Ball()
+        );
+
+    }
+
+}
+
+createBalls();
+
+
+/* =====================================================
+   BALL COLLISIONS
+===================================================== */
+
+function collide(){
+
+    for(
+        let i=0;
+        i<balls.length;
+        i++
+    ){
+
+        for(
+            let j=i+1;
+            j<balls.length;
+            j++
+        ){
+
+            const a =
+                balls[i];
+
+            const b =
+                balls[j];
+
+
+            const dx =
+                b.x-a.x;
+
+            const dy =
+                b.y-a.y;
+
+            const dist =
+                Math.hypot(
+                    dx,
+                    dy
+                );
+
+            const min =
+                a.r+b.r;
+
+
+            if(
+                dist>0 &&
+                dist<min
+            ){
+
+                const nx =
+                    dx/dist;
+
+                const ny =
+                    dy/dist;
+
+                const push =
+                    (min-dist)/2;
+
+
+                a.x -=
+                    nx*push;
+
+                a.y -=
+                    ny*push;
+
+                b.x +=
+                    nx*push;
+
+                b.y +=
+                    ny*push;
+
+
+                const avx =
+                    a.vx;
+
+                const avy =
+                    a.vy;
+
+
+                a.vx =
+                    b.vx*.9;
+
+                a.vy =
+                    b.vy*.9;
+
+                b.vx =
+                    avx*.9;
+
+                b.vy =
+                    avy*.9;
+
+            }
+
+        }
+
+    }
+
+}
+
+
+/* =====================================================
+   AUDIO
+===================================================== */
+
+let audioContext = null;
+
+let analyser = null;
+
+let stream = null;
+
+let data = null;
+
+let microphoneOn = false;
+
+let noiseLevel = 0;
+
+let displayedDB = 30;
+
+
+/* =====================================================
+   MICROPHONE
+===================================================== */
+
+async function startMicrophone(){
+
+    if(
+        microphoneOn
+    ){
+
+        stopMicrophone();
+
+        return;
+
+    }
+
+
+    try{
+
+        stream =
+            await navigator
+            .mediaDevices
+            .getUserMedia({
+
+                audio:{
+                    echoCancellation:false,
+                    noiseSuppression:false,
+                    autoGainControl:false
+                }
+
+            });
+
+
+        audioContext =
+            new (
+                window.AudioContext ||
+                window.webkitAudioContext
+            )();
+
+
+        analyser =
+            audioContext
+            .createAnalyser();
+
+
+        analyser.fftSize =
+            1024;
+
+        analyser.smoothingTimeConstant =
+            .72;
+
+
+        data =
+            new Uint8Array(
+                analyser.fftSize
+            );
+
+
+        const source =
+            audioContext
+            .createMediaStreamSource(
+                stream
+            );
+
+
+        source.connect(
+            analyser
+        );
+
+
+        microphoneOn =
+            true;
+
+
+        document
+        .getElementById("dot")
+        .classList
+        .add("on");
+
+
+        document.getElementById(
+            "micText"
+        ).textContent =
+            "Микрофон қосулы";
+
+
+        document.getElementById(
+            "start"
+        ).classList
+        .add("hidden");
+
+
+        readAudio();
+
+    }
+    catch(error){
+
+        alert(
+            "Микрофонға рұқсат беріңіз."
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   STOP
+===================================================== */
+
+function stopMicrophone(){
+
+    if(stream){
+
+        stream
+        .getTracks()
+        .forEach(
+            track =>
+            track.stop()
+        );
+
+    }
+
+
+    if(audioContext){
+
+        audioContext.close();
+
+    }
+
+
+    microphoneOn=false;
+
+    analyser=null;
+
+    noiseLevel=0;
+
+
+    document
+    .getElementById("dot")
+    .classList
+    .remove("on");
+
+
+    document.getElementById(
+        "micText"
+    ).textContent =
+        "Микрофонды қосу";
+
+}
+
+
+/* =====================================================
+   READ AUDIO
+===================================================== */
+
+let lastSoundTime=0;
+
+let lastSpeech="";
+
+
+function readAudio(){
+
+    if(
+        !microphoneOn ||
+        !analyser
+    )
+        return;
+
+
+    analyser.getByteTimeDomainData(
+        data
+    );
+
+
+    let sum=0;
+
+
+    for(
+        let i=0;
+        i<data.length;
+        i++
+    ){
+
+        const value =
+            (data[i]-128)/128;
+
+        sum +=
+            value*value;
+
+    }
+
+
+    const rms =
+        Math.sqrt(
+            sum/data.length
+        );
+
+
+    /*
+     * Браузер микрофоннан
+     * нақты кәсіби dB SPL бермейді.
+     *
+     * Сондықтан бұл — сыныптағы
+     * шуды көрсетуге арналған
+     * шамамен шкала.
+     */
+
+    let level =
+        (rms-.008)*8;
+
+
+    level =
+        Math.max(
+            0,
+            Math.min(
+                1,
+                level
+            )
+        );
+
+
+    noiseLevel +=
+        (
+            level-noiseLevel
+        )*.16;
+
+
+    displayedDB =
+        Math.round(
+            30+
+            noiseLevel*65
+        );
+
+
+    updateSound(
+        displayedDB
+    );
+
+
+    requestAnimationFrame(
+        readAudio
+    );
+
+}
+
+
+/* =====================================================
+   SOUND ZONES
+===================================================== */
+
+function getZone(db){
+
+    if(db<40){
+
+        return "Бос, тыныш сынып";
+
+    }
+
+    if(db<50){
+
+        return "Оқушылар тыныш жұмыс істеп отыр";
+
+    }
+
+    if(db<60){
+
+        return "Қалыпты сабақ, әңгімелесу";
+
+    }
+
+    if(db<70){
+
+        return "Топтық жұмыс, қызу әңгіме";
+
+    }
+
+    if(db<80){
+
+        return "Қатты шу, айқай";
+
+    }
+
+    return "Өте қатты шу";
+
+}
+
+
+/* =====================================================
+   SPEECH
+===================================================== */
+
+function say(text){
+
+    if(
+        !("speechSynthesis" in window)
+    )
+        return;
+
+
+    const now =
+        Date.now();
+
+
+    /*
+     * Бір секунд сайын қайта-қайта
+     * сөйлемесін.
+     */
+
+    if(
+        now-lastSoundTime<1800
+    )
+        return;
+
+
+    lastSoundTime =
+        now;
+
+
+    speechSynthesis.cancel();
+
+
+    const voice =
+        new SpeechSynthesisUtterance(
+            text
+        );
+
+
+    voice.lang =
+        "ru-RU";
+
+    voice.rate =
+        1.15;
+
+    voice.pitch =
+        1.05;
+
+    voice.volume =
+        1;
+
+
+    speechSynthesis.speak(
+        voice
+    );
+
+
+    showSpeech(
+        text
+    );
+
+}
+
+
+/* =====================================================
+   SPEECH BUBBLE
+===================================================== */
+
+function showSpeech(text){
+
+    /*
+     * Бірнеше шарик бір уақытта
+     * сөйлеп тұрғандай эффект.
+     */
+
+    const amount =
+        noiseLevel>.72
+        ? 5
+        : 3;
+
+
+    for(
+        let i=0;
+        i<amount;
+        i++
+    ){
+
+        const ball =
+            balls[
+                Math.floor(
+                    Math.random()*
+                    balls.length
+                )
+            ];
+
+
+        const el =
+            document.createElement(
+                "div"
+            );
+
+
+        el.className =
+            "speech show";
+
+
+        el.textContent =
+            text;
+
+
+        el.style.left =
+            ball.x+"px";
+
+
+        el.style.top =
+            ball.y-ball.r-8+"px";
+
+
+        document.body.appendChild(
+            el
+        );
+
+
+        setTimeout(
+            ()=>{
+                el.remove();
+            },
+            1450
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   SOUND UPDATE
+===================================================== */
+
+let currentZone =
+    "";
+
+
+function updateSound(db){
+
+    document.getElementById(
+        "db"
+    ).textContent =
+        db;
+
+
+    const percent =
+        Math.min(
+            100,
+            Math.max(
+                0,
+                (db-30)/65*100
+            )
+        );
+
+
+    document.getElementById(
+        "fill"
+    ).style.width =
+        percent+"%";
+
+
+    const zone =
+        getZone(db);
+
+
+    document.getElementById(
+        "zone"
+    ).textContent =
+        zone;
+
+
+    /*
+     * Текущая зона
+     */
+
+    let newZone;
+
+
+    if(db>=80){
+
+        newZone =
+            "danger";
+
+    }
+    else if(db>=70){
+
+        newZone =
+            "tsh";
+
+    }
+    else if(db>=60){
+
+        newZone =
+            "hey";
+
+    }
+    else{
+
+        newZone =
+            "normal";
+
+    }
+
+
+    /*
+     * Текущая зона өзгергенде
+     * ғана сөйлейді.
+     */
+
+    if(
+        newZone!==currentZone
+    ){
+
+        currentZone =
+            newZone;
+
+
+        if(
+            newZone==="hey"
+        ){
+
+            say(
+                "Эй!"
+            );
+
+        }
+
+
+        if(
+            newZone==="tsh"
+        ){
+
+            say(
+                "Тшш!"
+            );
+
+        }
+
+
+        if(
+            newZone==="danger"
+        ){
+
+            say(
+                "Тшш! Тыныш!"
+            );
+
+        }
+
+    }
+
+}
+
+
+/* =====================================================
+   DRAW
+===================================================== */
+
+function drawBackground(){
+
+    const gradient =
+        ctx.createRadialGradient(
+            W*.5,
+            H*.45,
+            0,
+            W*.5,
+            H*.45,
+            Math.max(W,H)
+        );
+
+
+    gradient.addColorStop(
+        0,
+        "#10172a"
+    );
+
+    gradient.addColorStop(
+        .5,
+        "#080d18"
+    );
+
+    gradient.addColorStop(
+        1,
+        "#03050a"
+    );
+
+
+    ctx.fillStyle =
+        gradient;
+
+
+    ctx.fillRect(
+        0,
+        0,
+        W,
+        H
+    );
+
+
+    /*
+     * Жеңіл тор
+     */
+
+    ctx.strokeStyle =
+        "rgba(100,130,190,.035)";
+
+
+    const grid=45;
+
+
+    for(
+        let x=0;
+        x<W;
+        x+=grid
+    ){
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            x,
+            0
+        );
+
+        ctx.lineTo(
+            x,
+            H
+        );
+
+        ctx.stroke();
+
+    }
+
+
+    for(
+        let y=0;
+        y<H;
+        y+=grid
+    ){
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            0,
+            y
+        );
+
+        ctx.lineTo(
+            W,
+            y
+        );
+
+        ctx.stroke();
+
+    }
+
+}
+
+
+/* =====================================================
+   LOOP
+===================================================== */
+
+function loop(){
+
+    drawBackground();
+
+
+    balls.forEach(
+        ball =>
+        ball.update()
+    );
+
+
+    collide();
+
+
+    balls.forEach(
+        ball =>
+        ball.draw()
+    );
+
+
+    requestAnimationFrame(
+        loop
+    );
+
+}
+
+
+loop();
+
+
+/* =====================================================
+   BUTTONS
+===================================================== */
+
+document.getElementById(
+    "micButton"
+).addEventListener(
+    "click",
+    startMicrophone
+);
+
+
+document.getElementById(
+    "startButton"
+).addEventListener(
+    "click",
+    startMicrophone
+);
+
+</script>
+
+</body>
+</html>
